@@ -2111,6 +2111,9 @@ scrollbarhorizontal sliderbar {
   color: #F2F2F2;
   cursor: default;
 }
+.subtitle-title:not([selected]) {
+  opacity: 0.5;
+}
 .subtitle-title:focus:not(:disabled, [disabled]), .subtitle-title:hover:not(:disabled, [disabled], [selected]) {
   color: #B97DF2;
 }

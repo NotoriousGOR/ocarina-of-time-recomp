@@ -14,7 +14,7 @@ here, not to the upstream project or its Discord. Credits: [CREDITS.md](CREDITS.
 Licence: GPL-3.0 as upstream (see COPYING). The game is required to build or run this; no game assets are included.
 
 ## Playing both games on macOS
-The Ocarina & Majora launcher contains the Ocarina of Time port and opens Majora's Mask in a separate **Zelda 64: Recompiled** app. That second app must be installed separately in `~/Applications/Zelda64Recompiled.app` or `/Applications/Zelda64Recompiled.app`; it is not bundled here. This keeps the two games in separate executables rather than combining their generated game code.
+Majora's Mask is selected by default. Click either game title to select it; the familiar menu appears under the selected title. **Start game** starts Ocarina of Time in this app or opens Majora's Mask in a separate **Zelda 64: Recompiled** app. That second app must be installed separately in `~/Applications/Zelda64Recompiled.app` or `/Applications/Zelda64Recompiled.app`; it is not bundled here. This keeps the two games in separate executables rather than combining their generated game code. The Majora **Mods** option opens that separate app; controls and settings use the shared configuration.
 
 Both apps use the `Zelda64Recompiled` application-support folder, so controller mappings and settings are shared. To set up Ocarina of Time on a new Mac, place your legally obtained North American Rev 1 ROM at:
 

@@ -50,7 +50,7 @@ Use the generated ELF and ROM from `oot/build/ntsc-1.1/` for the recompiler inpu
 
 ## 4. Set up the games
 
-The Ocarina & Majora macOS launcher runs Ocarina of Time itself and opens Majora's Mask in a separate Zelda 64: Recompiled app. Install that app separately at `~/Applications/Zelda64Recompiled.app` or `/Applications/Zelda64Recompiled.app`; it is not bundled with this fork.
+The Ocarina & Majora macOS launcher runs Ocarina of Time itself and opens Majora's Mask in a separate Zelda 64: Recompiled app. Click a game title to select it; only the selected game's menu is shown. Install that app separately at `~/Applications/Zelda64Recompiled.app` or `/Applications/Zelda64Recompiled.app`; it is not bundled with this fork.
 
 Place the original North American Rev 1 ROM at `~/Library/Application Support/Zelda64Recompiled/roms/oot.ntsc-u.rev1.z64`. The launcher detects it automatically and does not provide a ROM picker. Both applications use the same `Zelda64Recompiled` support folder for controls and settings. Do not commit ROMs.
 

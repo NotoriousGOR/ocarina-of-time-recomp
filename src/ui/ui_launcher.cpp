@@ -9,13 +9,10 @@
 #include <string>
 
 static std::string version_string;
+static Rml::DataModelHandle launcher_model_handle;
 
 bool oot_rom_valid = false;
-#ifdef __APPLE__
-bool majora_launch_available = true;
-#else
-bool majora_launch_available = false;
-#endif
+bool majora_selected = true;
 
 extern std::vector<recomp::GameEntry> supported_games;
 
@@ -96,9 +93,27 @@ static void open_mods_menu() {
     recompui::show_context(recompui::get_config_context_id(), "");
 }
 
+static void launch_majora_app() {
+#ifdef __APPLE__
+    if (!zelda64::launch_majora_app()) {
+        recompui::message_box(
+                "Install Zelda 64: Recompiled in ~/Applications or /Applications to launch Majora's Mask.");
+    }
+#else
+    recompui::message_box("Launching Majora's Mask from this app is supported on macOS only.");
+#endif
+}
+
 // Called by the Setup_InitImpl patch to choose between the intro and the developer map select.
 extern "C" void recomp_get_start_map_select(uint8_t* rdram, recomp_context* ctx) {
     _return(ctx, static_cast<s32>(start_map_select));
+}
+
+static void select_game(bool select_majora) {
+    if (majora_selected != select_majora) {
+        majora_selected = select_majora;
+        launcher_model_handle.DirtyVariable("majora_selected");
+    }
 }
 
 bool recompui::try_autostart() {
@@ -135,20 +150,22 @@ public:
 		launcher_context = recompui::create_context(zelda64::get_asset_path("launcher.rml"));
     }
     void register_events(recompui::UiEventListenerInstancer& listener) override {
-        recompui::register_event(listener, "launch_majora",
+        recompui::register_event(listener, "select_oot",
             [](const std::string& param, Rml::Event& event) {
-#ifdef __APPLE__
-                if (!zelda64::launch_majora_app()) {
-                    recompui::message_box(
-                            "Install Zelda 64: Recompiled in ~/Applications or /Applications to launch Majora's Mask.");
-                }
-#else
-                recompui::message_box("Launching Majora's Mask from this app is supported on macOS only.");
-#endif
+                select_game(false);
+            }
+        );
+        recompui::register_event(listener, "select_majora",
+            [](const std::string& param, Rml::Event& event) {
+                select_game(true);
             }
         );
         recompui::register_event(listener, "start_game",
             [](const std::string& param, Rml::Event& event) {
+                if (majora_selected) {
+                    launch_majora_app();
+                    return;
+                }
                 detect_oot_rom();
                 if (!oot_rom_valid) {
                     recompui::message_box(oot_rom_error.c_str());
@@ -175,7 +192,12 @@ public:
         );
         recompui::register_event(listener, "open_mods",
             [](const std::string &param, Rml::Event &event) {
-                open_mods_menu();
+                if (majora_selected) {
+                    launch_majora_app();
+                }
+                else {
+                    open_mods_menu();
+                }
             }
         );
         recompui::register_event(listener, "exit_game",
@@ -187,10 +209,11 @@ public:
     void make_bindings(Rml::Context* context) override {
         Rml::DataModelConstructor constructor = context->CreateDataModel("launcher_model");
 
-        constructor.Bind("majora_launch_available", &majora_launch_available);
+        constructor.Bind("majora_selected", &majora_selected);
 
         version_string = recomp::get_project_version().to_string();
         constructor.Bind("version_number", &version_string);
+        launcher_model_handle = constructor.GetModelHandle();
     }
 };
 

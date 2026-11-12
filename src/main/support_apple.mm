@@ -1,5 +1,6 @@
 #include "zelda_support.h"
 #import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
 #import <objc/runtime.h>
 #import <objc/message.h>
 #include <SDL.h>
@@ -29,6 +30,24 @@ namespace zelda64 {
     std::filesystem::path get_bundle_directory() {
         NSString *bundlePath = [[NSBundle mainBundle] bundlePath];
         return std::filesystem::path([bundlePath UTF8String]);
+    }
+
+    bool launch_majora_app() {
+        NSArray<NSString*>* app_paths = @[
+            [NSHomeDirectory() stringByAppendingPathComponent:@"Applications/Zelda64Recompiled.app"],
+            @"/Applications/Zelda64Recompiled.app"
+        ];
+        NSWorkspace* workspace = [NSWorkspace sharedWorkspace];
+        for (NSString* app_path in app_paths) {
+            NSURL* app_url = [NSURL fileURLWithPath:app_path isDirectory:YES];
+            NSError* error = nil;
+            if ([[NSFileManager defaultManager] fileExistsAtPath:app_path]) {
+                return [workspace openApplicationAtURL:app_url
+                                          configuration:[NSWorkspaceOpenConfiguration configuration]
+                                                  error:&error] != nil;
+            }
+        }
+        return false;
     }
 }
 

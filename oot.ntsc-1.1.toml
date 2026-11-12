@@ -1,0 +1,25 @@
+# Config file for Ocarina of Time NTSC-U 1.1 (USA Rev 1).
+# The ELF and ROM come from zeldaret/oot built with VERSION=ntsc-1.1 REGION=US.
+
+[input]
+entrypoint = 0x80000400
+output_func_path = "RecompiledFuncs"
+relocatable_sections_path = "overlays.n64.txt"
+# This local ELF copy has "..makerom.ent" renamed to "..makerom_ent" for C identifier generation.
+elf_path = "oot.ntsc-1.1.elf"
+rom_file_path = "../oot/build/ntsc-1.1/oot-ntsc-1.1.z64"
+
+function_sizes = [
+    { name = "KanjiTex_CodepointToOffset", size = 0x98 },
+]
+
+[patches]
+stubs = [
+    "LeoGetAAdr",
+    "LeoGetKAdr",
+    "RcpUtils_Reset",
+    "RcpUtils_PrintRegisterStatus",
+    "CIC6105_SaveBootMagicValues",
+    "CIC6105_RunBootTask",
+    "osDriveRomInit",
+]

@@ -1,15 +1,21 @@
 # Define the path to the entitlements file
 set(ENTITLEMENTS_FILE ${CMAKE_SOURCE_DIR}/.github/macos/entitlements.plist)
+set(MACOSX_BUNDLE_BUNDLE_NAME "Ocarina &amp; Majora")
+set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.github.notoriousgor.ocarinaandmajora")
+set(MACOSX_BUNDLE_BUNDLE_VERSION "1.0")
+set(MACOSX_BUNDLE_SHORT_VERSION_STRING "1.0")
+set(MACOSX_BUNDLE_ICON_FILE "AppIcon.icns")
+set(MACOSX_BUNDLE_EXECUTABLE_NAME "Ocarina &amp; Majora")
 
 # Set bundle properties
 set_target_properties(Zelda64Recompiled PROPERTIES
         MACOSX_BUNDLE TRUE
-        OUTPUT_NAME "OoTRecompiled"
-        MACOSX_BUNDLE_BUNDLE_NAME "Ocarina of Time: Recompiled"
-        MACOSX_BUNDLE_GUI_IDENTIFIER "com.github.asadsi.ootrecompiled"
-        MACOSX_BUNDLE_BUNDLE_VERSION "1.0"
-        MACOSX_BUNDLE_SHORT_VERSION_STRING "1.0"
-        MACOSX_BUNDLE_ICON_FILE "AppIcon.icns"
+        OUTPUT_NAME "Ocarina & Majora"
+        MACOSX_BUNDLE_BUNDLE_NAME "${MACOSX_BUNDLE_BUNDLE_NAME}"
+        MACOSX_BUNDLE_GUI_IDENTIFIER "${MACOSX_BUNDLE_GUI_IDENTIFIER}"
+        MACOSX_BUNDLE_BUNDLE_VERSION "${MACOSX_BUNDLE_BUNDLE_VERSION}"
+        MACOSX_BUNDLE_SHORT_VERSION_STRING "${MACOSX_BUNDLE_SHORT_VERSION_STRING}"
+        MACOSX_BUNDLE_ICON_FILE "${MACOSX_BUNDLE_ICON_FILE}"
         MACOSX_BUNDLE_INFO_PLIST ${CMAKE_BINARY_DIR}/Info.plist
         XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "-"
         XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS ${ENTITLEMENTS_FILE}
@@ -66,7 +72,12 @@ endif()
 # Post-build steps for macOS bundle
 add_custom_command(TARGET Zelda64Recompiled POST_BUILD
     # Copy and fix frameworks first
-    COMMAND ${CMAKE_COMMAND} -D CMAKE_BUILD_TYPE=$<CONFIG> -D CMAKE_GENERATOR=${CMAKE_GENERATOR} -P ${CMAKE_SOURCE_DIR}/.github/macos/fixup_bundle.cmake
+    COMMAND ${CMAKE_COMMAND}
+        "-D BUNDLE_EXECUTABLE=$<TARGET_FILE:Zelda64Recompiled>"
+        "-D BUNDLE_FRAMEWORKS_DIR=$<TARGET_BUNDLE_DIR:Zelda64Recompiled>/Contents/Frameworks"
+        -P ${CMAKE_SOURCE_DIR}/.github/macos/fixup_bundle.cmake
+    # SDL2-compat loads SDL3 by its unversioned name at runtime.
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:SDL3::SDL3> $<TARGET_BUNDLE_DIR:Zelda64Recompiled>/Contents/Frameworks/libSDL3.dylib
 
     # Copy all resources
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/assets ${CMAKE_BINARY_DIR}/temp_assets

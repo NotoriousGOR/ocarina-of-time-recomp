@@ -20,6 +20,7 @@ namespace zelda64 {
     std::optional<std::filesystem::path> get_application_support_directory();
     std::filesystem::path get_bundle_resource_directory();
     std::filesystem::path get_bundle_directory();
+    bool launch_majora_app();
 #endif
 }
 

@@ -300,6 +300,7 @@ endif()
 
 if (APPLE)
     find_package(SDL2 REQUIRED)
+    find_package(SDL3 CONFIG REQUIRED)
     target_include_directories(Zelda64Recompiled PRIVATE ${SDL2_INCLUDE_DIRS})
 
     set(CMAKE_THREAD_PREFER_PTHREAD TRUE)

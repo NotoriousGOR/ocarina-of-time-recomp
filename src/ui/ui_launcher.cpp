@@ -5,48 +5,75 @@
 #include "librecomp/helpers.hpp"
 #include "ultramodern/ultramodern.hpp"
 #include "RmlUi/Core.h"
-#include "nfd.h"
 #include <filesystem>
+#include <string>
 
 static std::string version_string;
 
-Rml::DataModelHandle model_handle;
-bool mm_rom_valid = false;
+bool oot_rom_valid = false;
+#ifdef __APPLE__
+bool majora_launch_available = true;
+#else
+bool majora_launch_available = false;
+#endif
 
 extern std::vector<recomp::GameEntry> supported_games;
 
-void select_rom() {
-    nfdnchar_t* native_path = nullptr;
-    zelda64::open_file_dialog([](bool success, const std::filesystem::path& path) {
-        if (success) {
-            recomp::RomValidationError rom_error = recomp::select_rom(path, supported_games[0].game_id);
-            switch (rom_error) {
-                case recomp::RomValidationError::Good:
-                    mm_rom_valid = true;
-                    model_handle.DirtyVariable("mm_rom_valid");
-                    break;
-                case recomp::RomValidationError::FailedToOpen:
-                    recompui::message_box("Failed to open ROM file.");
-                    break;
-                case recomp::RomValidationError::NotARom:
-                    recompui::message_box("This is not a valid ROM file.");
-                    break;
-                case recomp::RomValidationError::IncorrectRom:
-                    recompui::message_box("This ROM is not the correct game.");
-                    break;
-                case recomp::RomValidationError::NotYet:
-                    recompui::message_box("This game isn't supported yet.");
-                    break;
-                case recomp::RomValidationError::IncorrectVersion:
-                    recompui::message_box(
-                            "This ROM is the correct game, but the wrong version.\nThis project requires the European N64 version of the game (PAL, Rev 1).");
-                    break;
-                case recomp::RomValidationError::OtherError:
-                    recompui::message_box("An unknown error has occurred.");
-                    break;
-            }
+static std::string oot_rom_error;
+
+static void detect_oot_rom() {
+    auto& game_id = supported_games[0].game_id;
+    if (recomp::is_rom_valid(game_id)) {
+        oot_rom_valid = true;
+        oot_rom_error.clear();
+        return;
+    }
+
+    const auto oot_rom_path =
+            zelda64::get_app_folder_path() / "roms" / "oot.ntsc-u.rev1.z64";
+    std::error_code ec;
+    if (!std::filesystem::exists(oot_rom_path, ec)) {
+        oot_rom_valid = false;
+        if (ec) {
+            oot_rom_error = "Could not check the Ocarina of Time ROM path.";
         }
-    });
+        else {
+            oot_rom_error = "Copy your NTSC-U Rev 1 ROM to:\n" + oot_rom_path.string();
+        }
+        return;
+    }
+
+    const auto error = recomp::select_rom(oot_rom_path, game_id);
+    if (error == recomp::RomValidationError::Good) {
+        recomp::check_all_stored_roms();
+        oot_rom_valid = recomp::is_rom_valid(game_id);
+        oot_rom_error.clear();
+        return;
+    }
+
+    oot_rom_valid = false;
+    switch (error) {
+        case recomp::RomValidationError::FailedToOpen:
+            oot_rom_error = "Could not open the ROM at:\n" + oot_rom_path.string();
+            break;
+        case recomp::RomValidationError::NotARom:
+            oot_rom_error = "The file at the Ocarina of Time ROM path is not a valid N64 ROM.";
+            break;
+        case recomp::RomValidationError::IncorrectRom:
+            oot_rom_error = "The ROM at the Ocarina of Time ROM path is not Ocarina of Time.";
+            break;
+        case recomp::RomValidationError::IncorrectVersion:
+            oot_rom_error = "Ocarina of Time requires the North American Rev 1 (NTSC 1.1) ROM.";
+            break;
+        case recomp::RomValidationError::NotYet:
+            oot_rom_error = "This ROM version is not supported.";
+            break;
+        case recomp::RomValidationError::OtherError:
+            oot_rom_error = "An unknown error occurred while loading the Ocarina of Time ROM.";
+            break;
+        case recomp::RomValidationError::Good:
+            break;
+    }
 }
 
 recompui::ContextId launcher_context;
@@ -80,7 +107,11 @@ bool recompui::try_autostart() {
         open_mods_menu();
         return true;
     }
-    if (!autostart_requested || !recomp::is_rom_valid(supported_games[0].game_id)) {
+    if (!autostart_requested) {
+        return false;
+    }
+    detect_oot_rom();
+    if (!oot_rom_valid) {
         return false;
     }
     autostart_requested = false;
@@ -95,7 +126,7 @@ recompui::ContextId recompui::get_launcher_context_id() {
 class LauncherMenu : public recompui::MenuController {
 public:
     LauncherMenu() {
-        mm_rom_valid = recomp::is_rom_valid(supported_games[0].game_id);
+        detect_oot_rom();
     }
     ~LauncherMenu() override {
 
@@ -104,19 +135,25 @@ public:
 		launcher_context = recompui::create_context(zelda64::get_asset_path("launcher.rml"));
     }
     void register_events(recompui::UiEventListenerInstancer& listener) override {
-        recompui::register_event(listener, "select_rom",
+        recompui::register_event(listener, "launch_majora",
             [](const std::string& param, Rml::Event& event) {
-                select_rom();
-            }
-        );
-        recompui::register_event(listener, "rom_selected",
-            [](const std::string& param, Rml::Event& event) {
-                mm_rom_valid = true;
-                model_handle.DirtyVariable("mm_rom_valid");
+#ifdef __APPLE__
+                if (!zelda64::launch_majora_app()) {
+                    recompui::message_box(
+                            "Install Zelda 64: Recompiled in ~/Applications or /Applications to launch Majora's Mask.");
+                }
+#else
+                recompui::message_box("Launching Majora's Mask from this app is supported on macOS only.");
+#endif
             }
         );
         recompui::register_event(listener, "start_game",
             [](const std::string& param, Rml::Event& event) {
+                detect_oot_rom();
+                if (!oot_rom_valid) {
+                    recompui::message_box(oot_rom_error.c_str());
+                    return;
+                }
                 start_map_select = false;
                 recomp::start_game(supported_games[0].game_id);
                 recompui::hide_all_contexts();
@@ -150,12 +187,10 @@ public:
     void make_bindings(Rml::Context* context) override {
         Rml::DataModelConstructor constructor = context->CreateDataModel("launcher_model");
 
-        constructor.Bind("mm_rom_valid", &mm_rom_valid);
+        constructor.Bind("majora_launch_available", &majora_launch_available);
 
         version_string = recomp::get_project_version().to_string();
         constructor.Bind("version_number", &version_string);
-
-        model_handle = constructor.GetModelHandle();
     }
 };
 

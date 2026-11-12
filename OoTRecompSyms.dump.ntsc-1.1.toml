@@ -1,0 +1,9 @@
+# Used with `N64Recomp OoTRecompSyms.dump.ntsc-1.1.toml --dump-context`.
+[input]
+entrypoint = 0x80000400
+output_func_path = "RecompiledFuncs"
+relocatable_sections_path = "overlays.n64.txt"
+elf_path = "oot.ntsc-1.1.elf"
+function_sizes = [
+    { name = "KanjiTex_CodepointToOffset", size = 0x98 },
+]

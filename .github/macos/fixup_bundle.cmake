@@ -3,17 +3,8 @@ include(BundleUtilities)
 # Check for pkgx installation
 find_program(PKGX_EXECUTABLE pkgx)
 
-# Xcode generator puts the build type in the build directory
-set(BUILD_PREFIX "")
-if (CMAKE_GENERATOR STREQUAL "Xcode")
-    set(BUILD_PREFIX "${CMAKE_BUILD_TYPE}/")
-endif()
-
-# Use generator expressions to get the absolute path to the bundle
-set(APPS "${BUILD_PREFIX}OoTRecompiled.app/Contents/MacOS/OoTRecompiled")
-
-# Set up framework search paths
-set(DIRS "${BUILD_PREFIX}OoTRecompiled.app/Contents/Frameworks")
+set(APPS "${BUNDLE_EXECUTABLE}")
+set(DIRS "${BUNDLE_FRAMEWORKS_DIR}")
 
 # Detect if we're using pkgx
 if(PKGX_EXECUTABLE)
@@ -22,7 +13,7 @@ if(PKGX_EXECUTABLE)
 endif()
 
 # Convert all paths to absolute paths
-file(REAL_PATH ${APPS} APPS)
+file(REAL_PATH "${APPS}" APPS)
 
 set(RESOLVED_DIRS "")
 foreach(DIR IN LISTS DIRS)

@@ -1,17 +1,28 @@
-# Ocarina of Time: Recompiled (unofficial fork of Zelda 64: Recompiled)
-Zelda 64: Recompiled is a project that uses [N64: Recompiled](https://github.com/Mr-Wiseguy/N64Recomp) to **statically recompile** Majora's Mask (and soon Ocarina of Time) into a native port with many new features, enhancements, and extensive mod support. This project uses [RT64](https://github.com/rt64/rt64) as the rendering engine to provide graphical enhancements.
+# Ocarina & Majora
+Zelda 64: Recompiled uses [N64: Recompiled](https://github.com/Mr-Wiseguy/N64Recomp) to **statically recompile** Nintendo 64 games into native ports with graphical enhancements and mod support. This fork ports Ocarina of Time and uses [RT64](https://github.com/rt64/rt64) as its rendering engine.
 
 ### **This repository and its releases do not contain game assets. The original game is required to build or run this project.**
 
 ### About this fork
 
 This is an **unofficial fork** of [Zelda 64: Recompiled](https://github.com/Zelda64Recomp/Zelda64Recomp) that adds
-an Ocarina of Time port (PAL 1.1) and a few mods. It is **not affiliated with or endorsed by** the Zelda 64:
+an Ocarina of Time port for the North American Rev 1 (NTSC 1.1) ROM and a few mods. Its macOS launcher can also open the separate Majora's Mask app. It is **not affiliated with or endorsed by** the Zelda 64:
 Recompiled team or Nintendo. **It was developed with AI assistance (Claude).** The upstream project has a
 no-generative-AI policy, so this work is kept in its own repository and is not offered upstream. Please report problems
 here, not to the upstream project or its Discord. Credits: [CREDITS.md](CREDITS.md).
 
 Licence: GPL-3.0 as upstream (see COPYING). The game is required to build or run this; no game assets are included.
+
+## Playing both games on macOS
+The Ocarina & Majora launcher contains the Ocarina of Time port and opens Majora's Mask in a separate **Zelda 64: Recompiled** app. That second app must be installed separately in `~/Applications/Zelda64Recompiled.app` or `/Applications/Zelda64Recompiled.app`; it is not bundled here. This keeps the two games in separate executables rather than combining their generated game code.
+
+Both apps use the `Zelda64Recompiled` application-support folder, so controller mappings and settings are shared. To set up Ocarina of Time on a new Mac, place your legally obtained North American Rev 1 ROM at:
+
+```text
+~/Library/Application Support/Zelda64Recompiled/roms/oot.ntsc-u.rev1.z64
+```
+
+The launcher checks this location automatically; it has no ROM picker. ROM files are not included in this repository.
 
 ## Table of Contents
 * [System Requirements](#system-requirements)
@@ -49,7 +60,7 @@ If you have issues with crashes on startup, make sure your graphics drivers are 
 ## Features
 
 #### Plug and Play
-Simply provide your copy of the North American version of the game in the main menu and start playing! This project will automatically load assets from the provided copy, so there is no need to go through a separate extraction step or build the game yourself. Other versions of the game may be supported in the future.
+Place a matching North American Ocarina of Time Rev 1 (NTSC 1.1) ROM in the documented application-support path and start playing. The app loads assets from the ROM; other versions are not supported by this fork.
 
 #### Fully Intact N64 Effects
 A lot of care was put into RT64 to make sure all graphical effects were rendered exactly as they did originally on the N64. No workarounds or "hacks" were made to replicate these effects, with the only modifications to them being made for enhancement purposes such as widescreen support. This includes framebuffer effects like the grayscale cutscenes and the Deku bubble projectile, depth effects like the lens of truth, decals such as shadows or impact textures, accurate lighting, shading effects like the fire arrows and bomb explosions, and various textures that are often rendered incorrectly.
@@ -74,6 +85,8 @@ Many mods are available on the project's Thunderstore page: https://thunderstore
 
 If you're interested in making mods for this project, check out [the mod template](https://github.com/Zelda64Recomp/MMRecompModTemplate) and [the modding documentation](https://hackmd.io/fMDiGEJ9TBSjomuZZOgzNg). If you're interested in making texture packs, check out [the RT64 documentation](https://github.com/rt64/rt64/blob/main/TEXTURE-PACKS.md).
 
+The upstream mod template and modding documentation above are for Majora's Mask; OoT mods must target this fork's NTSC-U 1.1 build.
+
 #### Dual Analog Camera
 Play with a dual analog control layout like later entries in the series! When this option is enabled, the right stick will control the camera. You can still have the C-Buttons mapped to the right stick if you so wish, so long as you also map them to other buttons on the controller. The right stick C-button inputs will be "silenced", except when you take out the ocarina, so you can still play the ocarina with the right stick.
 
@@ -88,6 +101,8 @@ Customize your experience by setting your stick deadzone to your liking, as well
 #### Autosaving
 Never worry about losing progress if your power goes out thanks to autosaving! The autosave system is designed to respect Majora's Mask's original save system and maintain the intention of owl saves by triggering automatically and replacing the previous autosave or owl save. However, if you'd still rather play with the untouched save system, simply turn off autosaving in the ingame menu.
 
+The owl-save behavior described above is specific to Majora's Mask and does not apply to Ocarina of Time.
+
 #### Low Input Lag
 This project has been optimized to have as little input lag as possible, making the game feel more responsive than ever!
 
@@ -100,7 +115,6 @@ A Linux binary as well as a Flatpak is available for playing on most up-to-date 
 To play on Steam Deck, extract the Linux build onto your deck. Then, in desktop mode, right click the Zelda64Recompiled executable file and select "Add to Steam". From there, you can return to Gaming mode and configure the controls as needed. See the [Steam Deck gyro aim FAQ section](#how-do-i-set-up-gyro-aiming-on-steam-deck) for more detailed instructions.
 
 ## Planned Features
-* Ocarina of Time support
 * Ray Tracing and Higher Quality Model Replacements (via RT64)
 * Multi-language support with support for loading custom translations
 
@@ -125,12 +139,10 @@ You'll probably also want to change the default behavior so that you don't need 
 - macOS: `~/Library/Application Support/Zelda64Recompiled/saves`
 
 #### How do I choose a different ROM?
-**You don't.** This project is **only** a port of Majora's Mask (and Ocarina of Time in the future), and it will only accept one specific ROM: the US version of the N64 release of Majora's Mask. ROMs in formats other than .z64 will be automatically converted, as long as it is the correct ROM. **It is not an emulator and it cannot run any arbitrary ROM.**
-
-Instead, you can change the game by installing mods. See the [mod support](#mod-support) section for details.
+The launcher intentionally has no ROM picker. It loads the North American Ocarina of Time Rev 1 (NTSC 1.1) ROM from `~/Library/Application Support/Zelda64Recompiled/roms/oot.ntsc-u.rev1.z64`. **It is not an emulator and cannot run arbitrary ROMs.**
 
 #### Does this project have a randomizer?
-Yes, there is a randomizer available as a mod for this project which can be found at https://github.com/RecompRando/MMRecompRando/releases/latest. Simply download MMRecompRando.zip from the releases and install it like any other mod.
+Randomizer mods are version-specific; the Majora's Mask randomizer linked by upstream does not apply to this Ocarina of Time fork.
 
 #### Can you run this project as a portable application?
 Yes, if you place a file named `portable.txt` in the same folder as the executable then this project will run in portable mode. In portable mode, the save files, config files, and mods are placed in the same folder as the executable.
@@ -148,7 +160,7 @@ Building is not required to play this project, as prebuilt binaries (which do no
 * [FreeType](https://freetype.org/) for font rendering, used by RmlUi  
 * [moodycamel::ConcurrentQueue](https://github.com/cameron314/concurrentqueue) for semaphores and fast, lock-free MPMC queues
 * [Gamepad Motion Helpers](https://github.com/JibbSmart/GamepadMotionHelpers) for sensor fusion and calibration algorithms to implement gyro aiming
-* [Majora's Mask Decompilation](https://github.com/zeldaret/mm) for headers and some function definitions, used for making patches or some enhancements
+* [Ocarina of Time Decompilation](https://github.com/zeldaret/oot) for headers and function definitions used by patches and enhancements
 * [Ares emulator](https://github.com/ares-emulator/ares) for RSP vector instruction reference implementations, used in RSP recompilation
 
 *Special thanks to [Blaze](https://runblaze.dev) for their support of this project. They provide high-performance Linux (AMD64 & ARM64) and Apple Silicon macOS runners for GitHub Actions, greatly reducing our automated build times.*

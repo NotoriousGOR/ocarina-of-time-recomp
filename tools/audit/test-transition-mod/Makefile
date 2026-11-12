@@ -13,9 +13,9 @@ WARNFLAGS := -Wall -Wextra -Wno-incompatible-library-redeclaration -Wno-unused-p
              -Wno-missing-braces -Wno-unsupported-floating-point-opt -Werror=section
 CFLAGS   := $(ARCHFLAGS) $(WARNFLAGS) -D_LANGUAGE_C -nostdinc -ffunction-sections
 CPPFLAGS := -DMIPS -DCOMPILER_GCC -DNON_MATCHING -DAVOID_UB -D_MIPS_SZINT=32 -D_MIPS_SZLONG=32 -D_MIPS_SZPTR=32 \
-            -DOOT_VERSION=PAL_1_1 -DOOT_REVISION=1 -DOOT_REGION=REGION_EU -DPLATFORM_N64=1 -DPLATFORM_GC=0 -DPLATFORM_IQUE=0 \
+            -DOOT_VERSION=NTSC_1_1 -DOOT_REVISION=1 -DOOT_REGION=REGION_US -DPLATFORM_N64=1 -DPLATFORM_GC=0 -DPLATFORM_IQUE=0 \
             -DLIBULTRA_VERSION=LIBULTRA_VERSION_I -DLIBULTRA_PATCH=1 -DDEBUG_FEATURES=0 -DF3DEX_GBI_2 -DNDEBUG \
-            -I include -I $(OOT) -I $(OOT)/build/pal-1.1 -I $(OOT)/extracted/pal-1.1 -I $(OOT)/include -I $(OOT)/include/libc
+            -I include -I $(OOT) -I $(OOT)/build/ntsc-1.1 -I $(OOT)/extracted/ntsc-1.1 -I $(OOT)/include -I $(OOT)/include/libc
 LDFLAGS  := -nostdlib -T $(LDSCRIPT) -Map $(BUILD_DIR)/mod.map --unresolved-symbols=ignore-all --emit-relocs -e 0 --no-nmagic -gc-sections
 
 C_SRCS := $(wildcard src/*.c)

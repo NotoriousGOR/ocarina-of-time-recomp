@@ -16,6 +16,6 @@ native_libraries = []
 [inputs]
 elf_path = "build/mod.elf"
 mod_filename = "oot_skip_intro"
-func_reference_syms_file = "../../OoTRecompSyms/oot.pal-1.1.syms.toml"
-data_reference_syms_files = [ "../../OoTRecompSyms/oot.pal-1.1.datasyms.toml" ]
+func_reference_syms_file = "../../OoTRecompSyms/oot.ntsc-1.1.syms.toml"
+data_reference_syms_files = [ "../../OoTRecompSyms/oot.ntsc-1.1.datasyms.toml" ]
 additional_files = []

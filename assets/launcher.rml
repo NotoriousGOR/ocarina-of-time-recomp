@@ -17,12 +17,18 @@
 				<div class="launcher__vertical-split">
 					<div class="launcher__title-quadrant">
 						<button class="subtitle-title" disabled>
-							<div><h3>Zelda 64: Recompiled</h3></div>
+							<div><h3>Ocarina &amp; Majora</h3></div>
 							<div><h1>Majora's Mask</h1></div>
-							<div class="subtitle-title__disclaimer">Not in this build</div>
+							<div class="subtitle-title__disclaimer" data-if="majora_launch_available">Opens the installed Zelda 64: Recompiled app</div>
 						</button>
 					</div>
-					<div class="launcher__content-quadrant"></div>
+					<div class="launcher__content-quadrant">
+						<button data-if="majora_launch_available" onclick="launch_majora" class="menu-list-item">
+							<div class="menu-list-item__bullet">•</div>
+							<div class="menu-list-item__label">Launch Majora's Mask</div>
+						</button>
+						<div data-if="!majora_launch_available" class="subtitle-title__disclaimer">Not available on this platform</div>
+					</div>
 				</div>
 				<div class="launcher__vertical-split launcher__vertical-split--right">
 					<div class="launcher__background-wrapper">
@@ -30,18 +36,14 @@
 					</div>
 					<div class="launcher__title-quadrant launcher__title-quadrant--right">
 						<button class="subtitle-title subtitle-title--right" selected>
-							<div><h3>Zelda 64: Recompiled</h3></div>
+							<div><h3>Ocarina &amp; Majora</h3></div>
 							<div><h1>Ocarina of Time</h1></div>
 						</button>
 					</div>
 					<div class="launcher__content-quadrant">
-						<button data-if="!mm_rom_valid" onclick="select_rom" class="menu-list-item menu-list-item--right" autofocus>
+						<button onclick="start_game" class="menu-list-item menu-list-item--right" autofocus>
 							<div class="menu-list-item__bullet">•</div>
-							<div class="menu-list-item__label">Select ROM</div>
-						</button>
-						<button data-if="mm_rom_valid" onclick="start_game" class="menu-list-item menu-list-item--right" autofocus>
-							<div class="menu-list-item__bullet">•</div>
-							<div class="menu-list-item__label">Start game</div>
+							<div class="menu-list-item__label">Start Ocarina of Time</div>
 						</button>
 						<button onclick="open_controls" class="menu-list-item menu-list-item--right">
 							<div class="menu-list-item__bullet">•</div>

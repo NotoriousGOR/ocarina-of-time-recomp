@@ -6,7 +6,7 @@
 entrypoint = 0x80000400
 # Paths are relative to the location of this config file.
 output_func_path = "RecompiledFuncs"
-relocatable_sections_path = "overlays.pal-1.1.txt"
+relocatable_sections_path = "overlays.n64.txt"
 # A copy of the decomp's ELF with "..makerom.ent" renamed to "..makerom_ent", since the section name
 # becomes a C identifier in the output:
 #   (only the section-name string is edited, in place; every other byte matches the decomp ELF)

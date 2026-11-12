@@ -1,0 +1,7 @@
+# JPEG decoding microcode from OoT NTSC-U 1.1.
+text_offset = 0xB5CCE0
+text_size = 0xAF0
+text_address = 0x04001080
+rom_file_path = "../oot/build/ntsc-1.1/oot-ntsc-1.1.z64"
+output_file_path = "rsp/njpgdspMain.cpp"
+output_function_name = "njpgdspMain"

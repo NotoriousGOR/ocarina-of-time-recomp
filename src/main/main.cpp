@@ -350,12 +350,12 @@ gpr get_entrypoint_address();
 // array of supported GameEntry objects
 std::vector<recomp::GameEntry> supported_games = {
     {
-        .rom_hash = 0x852608AC912F1081ULL,
+        .rom_hash = 0xD26310902C4A2D27ULL,
         .internal_name = "THE LEGEND OF ZELDA",
-        .game_id = u8"oot.n64.eu.1.1",
+        .game_id = u8"oot.n64.us.1.1",
         .mod_game_id = "oot",
         .save_type = recomp::SaveType::Sram,
-        .is_enabled = false,
+        .is_enabled = true,
         .decompression_routine = zelda64::decompress_oot,
         .has_compressed_code = true,
         .entrypoint_address = get_entrypoint_address(),

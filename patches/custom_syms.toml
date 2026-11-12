@@ -11,7 +11,7 @@ symbols = [
     { name = "MapSelect_Init_NORELOCATE", vram = 0x80801C14 },
     # File statics of z_parameter.c (the magic meter's border color), which have no symbols. Found from the
     # relocations in Magic_Update: z_parameter.o's .data + 0x1B8/0x1BC/0x1C0.
-    { name = "sMagicBorderR", vram = 0x800F5498 },
-    { name = "sMagicBorderG", vram = 0x800F549C },
-    { name = "sMagicBorderB", vram = 0x800F54A0 },
+    { name = "sMagicBorderR", vram = 0x800F76C8 },
+    { name = "sMagicBorderG", vram = 0x800F76CA },
+    { name = "sMagicBorderB", vram = 0x800F76CC },
 ]

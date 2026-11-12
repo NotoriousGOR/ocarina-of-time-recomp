@@ -69,6 +69,12 @@ if(NOT EXISTS ${ENTITLEMENTS_FILE})
     message(FATAL_ERROR "Entitlements file not found at ${ENTITLEMENTS_FILE}")
 endif()
 
+# Rerun the resource copy and signing when bundled assets change.
+file(GLOB_RECURSE BUNDLE_RESOURCES CONFIGURE_DEPENDS LIST_DIRECTORIES false "${CMAKE_SOURCE_DIR}/assets/*")
+list(FILTER BUNDLE_RESOURCES EXCLUDE REGEX "/scss/")
+set_property(TARGET Zelda64Recompiled APPEND PROPERTY LINK_DEPENDS
+    ${BUNDLE_RESOURCES} "${CMAKE_SOURCE_DIR}/recompcontrollerdb.txt")
+
 # Post-build steps for macOS bundle
 add_custom_command(TARGET Zelda64Recompiled POST_BUILD
     # Copy and fix frameworks first

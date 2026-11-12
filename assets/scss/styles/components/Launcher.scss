@@ -57,6 +57,7 @@
     left: -70vw;
     align-items: center;
     justify-content: flex-start;
+    pointer-events: none;
     transform: translateX(space(0));
     animation: 25s cubic-out 1 slide-mm-bg-over;
 }
@@ -79,6 +80,16 @@
     width: auto;
     height: 100%;
     animation: 2.5s cubic-in-out 1 fade-mm-in;
+    opacity: 0.1;
+}
+
+.launcher__background-oot {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
     opacity: 0.1;
 }
 

@@ -61,6 +61,38 @@ SET(RMLUI_TESTS_ENABLED OFF CACHE BOOL "" FORCE)
 add_subdirectory(${CMAKE_SOURCE_DIR}/lib/RmlUi)
 target_compile_definitions(rmlui_core PRIVATE LUNASVG_BUILD_STATIC)
 
+add_executable(launcher_selection_test EXCLUDE_FROM_ALL tests/launcher_selection_test.cpp)
+target_link_libraries(launcher_selection_test PRIVATE RmlUi::Core)
+add_custom_target(check_launcher_selection
+    COMMAND $<TARGET_FILE:launcher_selection_test> "${CMAKE_SOURCE_DIR}/assets"
+    DEPENDS launcher_selection_test
+    VERBATIM
+)
+
+add_executable(rom_decompression_test EXCLUDE_FROM_ALL tests/rom_decompression_test.cpp src/game/rom_decompression.cpp)
+target_include_directories(rom_decompression_test PRIVATE ${CMAKE_SOURCE_DIR}/include)
+add_custom_target(check_rom_decompression
+    COMMAND $<TARGET_FILE:rom_decompression_test>
+    DEPENDS rom_decompression_test
+    VERBATIM
+)
+
+add_executable(gopher64_cheat_engine_test EXCLUDE_FROM_ALL tests/gopher64_cheat_engine_test.c)
+add_custom_target(check_gopher64_cheat_engine
+    COMMAND $<TARGET_FILE:gopher64_cheat_engine_test>
+    DEPENDS gopher64_cheat_engine_test
+    VERBATIM
+)
+
+if (APPLE)
+    add_executable(runtime_paths_test EXCLUDE_FROM_ALL tests/runtime_paths_test.cpp src/main/runtime_paths.cpp)
+    add_custom_target(check_runtime_paths
+        COMMAND $<TARGET_FILE:runtime_paths_test>
+        DEPENDS runtime_paths_test
+        VERBATIM
+    )
+endif()
+
 add_subdirectory(${CMAKE_SOURCE_DIR}/lib/N64ModernRuntime)
 
 target_include_directories(rt64 PRIVATE ${CMAKE_BINARY_DIR}/rt64/src)
@@ -152,6 +184,7 @@ add_executable(Zelda64Recompiled)
 
 set (SOURCES
     ${CMAKE_SOURCE_DIR}/src/main/main.cpp
+    ${CMAKE_SOURCE_DIR}/src/main/runtime_paths.cpp
     ${CMAKE_SOURCE_DIR}/src/main/support.cpp
     ${CMAKE_SOURCE_DIR}/src/main/register_overlays.cpp
     ${CMAKE_SOURCE_DIR}/src/main/register_patches.cpp

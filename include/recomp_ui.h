@@ -126,6 +126,7 @@ namespace recompui {
     void get_window_size(int& width, int& height);
     void set_cursor_visible(bool visible);
     void update_supported_options();
+    void reload_shared_settings();
     void toggle_fullscreen();
 
     bool get_cont_active(void);

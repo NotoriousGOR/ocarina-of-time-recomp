@@ -1967,6 +1967,7 @@ scrollbarhorizontal sliderbar {
   left: -70vw;
   align-items: center;
   justify-content: flex-start;
+  pointer-events: none;
   transform: translateX(0dp);
   animation: 25s cubic-out 1 slide-mm-bg-over;
 }
@@ -1987,6 +1988,16 @@ scrollbarhorizontal sliderbar {
   width: auto;
   height: 100%;
   animation: 2.5s cubic-in-out 1 fade-mm-in;
+  opacity: 0.1;
+}
+
+.launcher__background-oot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
   opacity: 0.1;
 }
 
@@ -2047,7 +2058,7 @@ scrollbarhorizontal sliderbar {
 }
 .menu-list-item--right .menu-list-item__bullet {
   margin-left: 12dp;
-  opacity: 1;
+  visibility: hidden;
 }
 .menu-list-item--right.menu-list-item:focus:not(:disabled, [disabled]), .menu-list-item--right.menu-list-item:hover:not(:disabled, [disabled]) {
   decorator: horizontal-gradient(#7A2AC600 #DABAF714);

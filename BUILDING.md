@@ -7,14 +7,22 @@ This project makes use of submodules so you will need to clone the repository wi
 
 ```bash
 git clone --recurse-submodules https://github.com/NotoriousGOR/ocarina-of-time-recomp.git
-# if you forgot to clone with --recurse-submodules
-# cd /path/to/cloned/repo && git submodule update --init --recursive
+cd ocarina-of-time-recomp
+# If you cloned without --recurse-submodules:
+# git submodule update --init --recursive
 ```
 
 ## 2. Install Dependencies
 
 ### macOS
-Install the Xcode command-line tools and Homebrew packages `cmake`, `ninja`, `llvm`, `make`, `libiconv`, `sdl2`, and `sdl3`.
+Install the Xcode command-line tools and [Homebrew](https://brew.sh/), then run:
+
+```bash
+brew install cmake ninja llvm lld make libiconv sdl2 sdl3
+export PATH="$(brew --prefix llvm)/bin:$PATH"
+```
+
+Keep the LLVM path in your shell for the remaining build steps.
 
 ### Linux
 For Linux the instructions for Ubuntu are provided, but you can find the equivalent packages for your preferred distro.
@@ -37,9 +45,12 @@ choco install make
 ```
 
 ## 3. Build the matching decompilation
-Clone [zeldaret/oot](https://github.com/zeldaret/oot) beside this repository, put your NTSC-U Rev 1 ROM at `oot/baseroms/ntsc-1.1/baserom.z64`, then build it:
+Clone the tested revision of [zeldaret/oot](https://github.com/zeldaret/oot) beside this repository, put your NTSC-U Rev 1 ROM at `oot/baseroms/ntsc-1.1/baserom.z64`, then build it:
 
 ```bash
+git clone https://github.com/zeldaret/oot.git ../oot
+git -C ../oot switch --detach 14759abf9abb4295de142cdc1452998630ea70fb
+# Put your original ROM at ../oot/baseroms/ntsc-1.1/baserom.z64.
 cd ../oot
 gmake setup VERSION=ntsc-1.1 REGION=US
 gmake -j4 VERSION=ntsc-1.1 REGION=US
@@ -104,9 +115,21 @@ cmake -S . -B build-cmake -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang 
 cmake --build build-cmake --target Zelda64Recompiled -j4 --config Release # or Debug
 ```
 
+You can check the launcher and ROM decompressor with:
+
+```bash
+cmake --build build-cmake --target check_launcher_selection check_rom_decompression
+```
+
 ## 7. Success
 
-Voilà! On macOS, the app bundle is `build-cmake/Ocarina & Majora.app`. Run it with the repository root as its working directory so it can find the assets.
+On macOS, quit any running copy before installing the app bundle:
+
+```bash
+mkdir -p "$HOME/Applications"
+ditto "build-cmake/Ocarina & Majora.app" "$HOME/Applications/Ocarina & Majora.app"
+open -a "$HOME/Applications/Ocarina & Majora.app"
+```
 
 > [!IMPORTANT]
 > In the game itself, use your original standard-format NTSC-U Rev 1 ROM, not the decompilation output.

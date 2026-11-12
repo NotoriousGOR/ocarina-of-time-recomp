@@ -37,14 +37,21 @@ namespace zelda64 {
             [NSHomeDirectory() stringByAppendingPathComponent:@"Applications/Zelda64Recompiled.app"],
             @"/Applications/Zelda64Recompiled.app"
         ];
-        NSWorkspace* workspace = [NSWorkspace sharedWorkspace];
         for (NSString* app_path in app_paths) {
             NSURL* app_url = [NSURL fileURLWithPath:app_path isDirectory:YES];
-            NSError* error = nil;
             if ([[NSFileManager defaultManager] fileExistsAtPath:app_path]) {
-                return [workspace openApplicationAtURL:app_url
-                                          configuration:[NSWorkspaceOpenConfiguration configuration]
-                                                  error:&error] != nil;
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [[NSWorkspace sharedWorkspace] openApplicationAtURL:app_url
+                        configuration:[NSWorkspaceOpenConfiguration configuration]
+                        completionHandler:^(NSRunningApplication* app, NSError* error) {
+                            if (error || !app) {
+                                NSString* reason = error ? error.localizedDescription : @"Unknown error.";
+                                NSString* message = [NSString stringWithFormat:@"Could not open Zelda 64: Recompiled:\n%@", reason];
+                                show_error_message_box("Ocarina & Majora", [message UTF8String]);
+                            }
+                        }];
+                });
+                return true;
             }
         }
         return false;

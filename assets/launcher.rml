@@ -14,6 +14,7 @@
 	<body>
 		<div id="window" data-model="launcher_model">
 			<div class="launcher">
+				<svg src="oot-ocarina.svg" class="launcher__background-oot" data-if="!majora_selected" />
 				<div class="launcher__vertical-split">
 					<div class="launcher__title-quadrant">
 						<button class="subtitle-title" onclick="select_oot" data-if="majora_selected">
@@ -49,8 +50,8 @@
 					</div>
 				</div>
 				<div class="launcher__vertical-split launcher__vertical-split--right">
-					<div class="launcher__background-wrapper">
-						<svg src="triforce.svg" class="launcher__background-mm" />
+					<div class="launcher__background-wrapper" data-if="majora_selected">
+						<svg src="mm-clipped.svg" class="launcher__background-mm" />
 					</div>
 					<div class="launcher__title-quadrant launcher__title-quadrant--right">
 						<button class="subtitle-title subtitle-title--right" onclick="select_majora" selected data-if="majora_selected">

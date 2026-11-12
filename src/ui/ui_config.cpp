@@ -992,6 +992,19 @@ bool zelda64::get_debug_mode_enabled() {
     return debug_context.debug_enabled;
 }
 
+void recompui::reload_shared_settings() {
+#ifdef __APPLE__
+    zelda64::load_config();
+    new_options = ultramodern::renderer::get_graphics_config();
+    if (controls_model_handle) {
+        controls_model_handle.DirtyVariable("inputs");
+    }
+    if (graphics_model_handle) {
+        graphics_model_handle.DirtyAllVariables();
+    }
+#endif
+}
+
 void zelda64::set_debug_mode_enabled(bool enabled) {
     debug_context.debug_enabled = enabled;
     if (debug_context.model_handle) {

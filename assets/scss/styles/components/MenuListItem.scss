@@ -30,7 +30,7 @@
 
         .menu-list-item__bullet {
             margin-left: space(12);
-            opacity: 1;
+            visibility: hidden;
         }
 
         &.menu-list-item:focus:not(:disabled, [disabled]),

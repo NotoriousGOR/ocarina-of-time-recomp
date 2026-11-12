@@ -36,6 +36,7 @@
 #include "zelda_game.h"
 #include "recomp_data.h"
 #include "ovl_patches.hpp"
+#include "runtime_paths.h"
 #include "librecomp/game.hpp"
 #include "librecomp/mods.hpp"
 #include "librecomp/helpers.hpp"
@@ -44,6 +45,10 @@
 #include "../../patches/input.h"
 #include "../../patches/sound.h"
 #include "../../patches/misc_funcs.h"
+#include "mods/oot_fast_songs.h"
+#include "mods/oot_faster_text.h"
+#include "mods/oot_skip_cutscenes.h"
+#include "mods/oot_skip_intro.h"
 #include "mods/oot_widescreen_hud.h"
 
 
@@ -646,15 +651,29 @@ int main(int argc, char** argv) {
         fprintf(stderr, "Failed to load controller mappings: %s\n", SDL_GetError());
     }
 
+#ifdef __APPLE__
+    try {
+        recomp::register_config_path(prepare_oot_runtime_path(zelda64::get_app_folder_path()));
+    }
+    catch (const std::filesystem::filesystem_error& error) {
+        fprintf(stderr, "Could not prepare OoT storage: %s\n", error.what());
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Ocarina & Majora", error.what(), nullptr);
+        return EXIT_FAILURE;
+    }
+#else
     recomp::register_config_path(zelda64::get_app_folder_path());
+#endif
 
     // Register supported games and patches
     for (const auto& game : supported_games) {
         recomp::register_game(game);
     }
 
+    recomp::mods::register_embedded_mod("oot_fast_songs", { (const uint8_t*)(oot_fast_songs), std::size(oot_fast_songs)});
+    recomp::mods::register_embedded_mod("oot_faster_text", { (const uint8_t*)(oot_faster_text), std::size(oot_faster_text)});
+    recomp::mods::register_embedded_mod("oot_skip_cutscenes", { (const uint8_t*)(oot_skip_cutscenes), std::size(oot_skip_cutscenes)});
+    recomp::mods::register_embedded_mod("oot_skip_intro", { (const uint8_t*)(oot_skip_intro), std::size(oot_skip_intro)});
     recomp::mods::register_embedded_mod("oot_widescreen_hud", { (const uint8_t*)(oot_widescreen_hud), std::size(oot_widescreen_hud)});
-
 
     REGISTER_FUNC(recomp_get_window_resolution);
     REGISTER_FUNC(recomp_get_target_aspect_ratio);

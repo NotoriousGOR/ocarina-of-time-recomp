@@ -169,11 +169,11 @@ std::vector<uint8_t> zelda64::decompress_mm(std::span<const uint8_t> compressed_
     return decompress_zelda64(compressed_rom, 0x1A500, 0x2F00000);
 }
 
-// Produces a decompressed OoT PAL 1.1 rom, matching the decomp's baserom-decompressed.z64.
+// Produces the decompressed OoT NTSC-U 1.1 layout used by the decomp.
 std::vector<uint8_t> zelda64::decompress_oot(std::span<const uint8_t> compressed_rom) {
-    if (!check_compressed_rom(compressed_rom, "NZLP")) {
+    if (!check_compressed_rom(compressed_rom, "CZLE") || compressed_rom[0x3F] != 1) {
         assert(false);
         return {};
     }
-    return decompress_zelda64(compressed_rom, 0x7950, 0x34D5000);
+    return decompress_zelda64(compressed_rom, 0x7430, 0x347F000);
 }

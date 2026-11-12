@@ -16,7 +16,7 @@ Licence: GPL-3.0 as upstream (see COPYING). The game is required to build or run
 ## Playing both games on macOS
 Majora's Mask is selected by default. Click either game title to select it; the familiar menu appears under the selected title. **Start game** starts Ocarina of Time in this app or opens Majora's Mask in a separate **Zelda 64: Recompiled** app. That second app must be installed separately in `~/Applications/Zelda64Recompiled.app` or `/Applications/Zelda64Recompiled.app`; it is not bundled here. This keeps the two games in separate executables rather than combining their generated game code. The Majora **Mods** option opens that separate app; controls and settings use the shared configuration.
 
-Both apps use the `Zelda64Recompiled` application-support folder, so controller mappings and settings are shared. To set up Ocarina of Time on a new Mac, place your legally obtained North American Rev 1 ROM at:
+Both apps use the `Zelda64Recompiled` application-support folder, so controller mappings and settings are shared. Each game keeps its own mod configuration; saves remain in the shared saves folder. To set up Ocarina of Time on a new Mac, place your legally obtained North American Rev 1 ROM at:
 
 ```text
 ~/Library/Application Support/Zelda64Recompiled/roms/oot.ntsc-u.rev1.z64
@@ -87,6 +87,10 @@ If you're interested in making mods for this project, check out [the mod templat
 
 The upstream mod template and modding documentation above are for Majora's Mask; OoT mods must target this fork's NTSC-U 1.1 build.
 
+The OoT build includes Faster Text, Skip Cutscenes, Skip Intro, Fast Songs, and Widescreen HUD. The separate Majora's Mask app retains its own mods. The [OoT Reloaded](https://evilgames.eu/texture-packs/oot-reloaded.htm) and [MM Reloaded](https://evilgames.eu/texture-packs/mm-reloaded.htm) texture packs are distributed separately; install each for its matching game using the pack instructions. OoT Rev 1 coverage has not been confirmed.
+
+Optional **Gopher64 Cheats** mods are game-specific. The repository includes a generator at `mod-src/gopher64-cheats/build.py`; it consumes a local `data/cheats.json` from [Gopher64](https://github.com/gopher64/gopher64) and requires the built `RecompModTool`. Cheat definitions and generated packages are not included. Cheats that modify executable instructions are unavailable in a recompilation, and conflicting variants are ignored. Back up saves before enabling cheats.
+
 #### Dual Analog Camera
 Play with a dual analog control layout like later entries in the series! When this option is enabled, the right stick will control the camera. You can still have the C-Buttons mapped to the right stick if you so wish, so long as you also map them to other buttons on the controller. The right stick C-button inputs will be "silenced", except when you take out the ocarina, so you can still play the ocarina with the right stick.
 
@@ -99,9 +103,7 @@ When playing with a supported controller, first-person items such as the bow can
 Customize your experience by setting your stick deadzone to your liking, as well as adjusting the X and Y axis inversion for both aiming and the optional dual analog camera.
 
 #### Autosaving
-Never worry about losing progress if your power goes out thanks to autosaving! The autosave system is designed to respect Majora's Mask's original save system and maintain the intention of owl saves by triggering automatically and replacing the previous autosave or owl save. However, if you'd still rather play with the untouched save system, simply turn off autosaving in the ingame menu.
-
-The owl-save behavior described above is specific to Majora's Mask and does not apply to Ocarina of Time.
+Enable **Autosaving** in General settings for both games. Ocarina of Time saves to the current file about every two minutes when gameplay is safe; like a normal save, loading resumes at Link's house, the Temple of Time, or the current dungeon entrance. Majora's Mask uses its existing autosave system, which replaces the current owl save. These are game saves, not save states.
 
 #### Low Input Lag
 This project has been optimized to have as little input lag as possible, making the game feel more responsive than ever!

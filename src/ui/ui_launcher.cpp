@@ -87,8 +87,9 @@ void recompui::request_open_mods() {
     open_mods_requested = true;
 }
 
-static void open_mods_menu() {
-    recompui::set_config_tab(recompui::ConfigTab::Mods);
+static void open_config_menu(recompui::ConfigTab tab) {
+    recompui::reload_shared_settings();
+    recompui::set_config_tab(tab);
     recompui::hide_all_contexts();
     recompui::show_context(recompui::get_config_context_id(), "");
 }
@@ -119,7 +120,7 @@ static void select_game(bool select_majora) {
 bool recompui::try_autostart() {
     if (open_mods_requested) {
         open_mods_requested = false;
-        open_mods_menu();
+        open_config_menu(recompui::ConfigTab::Mods);
         return true;
     }
     if (!autostart_requested) {
@@ -172,22 +173,19 @@ public:
                     return;
                 }
                 start_map_select = false;
+                recompui::reload_shared_settings();
                 recomp::start_game(supported_games[0].game_id);
                 recompui::hide_all_contexts();
             }
         );
         recompui::register_event(listener, "open_controls",
             [](const std::string& param, Rml::Event& event) {
-                recompui::set_config_tab(recompui::ConfigTab::Controls);
-                recompui::hide_all_contexts();
-                recompui::show_context(recompui::get_config_context_id(), "");
+                open_config_menu(recompui::ConfigTab::Controls);
             }
         );
         recompui::register_event(listener, "open_settings",
             [](const std::string& param, Rml::Event& event) {
-                recompui::set_config_tab(recompui::ConfigTab::General);
-                recompui::hide_all_contexts();
-                recompui::show_context(recompui::get_config_context_id(), "");
+                open_config_menu(recompui::ConfigTab::General);
             }
         );
         recompui::register_event(listener, "open_mods",
@@ -196,7 +194,7 @@ public:
                     launch_majora_app();
                 }
                 else {
-                    open_mods_menu();
+                    open_config_menu(recompui::ConfigTab::Mods);
                 }
             }
         );

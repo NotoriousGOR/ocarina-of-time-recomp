@@ -1,0 +1,244 @@
+diff --git a/.github/macos/apple_bundle.cmake b/.github/macos/apple_bundle.cmake
+index fa9bb87..599c5f8 100644
+--- a/.github/macos/apple_bundle.cmake
++++ b/.github/macos/apple_bundle.cmake
+@@ -62,6 +62,15 @@ if(NOT EXISTS ${ENTITLEMENTS_FILE})
+     message(FATAL_ERROR "Entitlements file not found at ${ENTITLEMENTS_FILE}")
+ endif()
+ 
++find_package(SDL3 CONFIG QUIET)
++if(TARGET SDL3::SDL3)
++    add_custom_command(TARGET Zelda64Recompiled POST_BUILD
++        COMMAND ${CMAKE_COMMAND} -E make_directory $<TARGET_BUNDLE_DIR:Zelda64Recompiled>/Contents/Frameworks
++        COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:SDL3::SDL3> $<TARGET_BUNDLE_DIR:Zelda64Recompiled>/Contents/Frameworks/libSDL3.dylib
++        VERBATIM
++    )
++endif()
++
+ # Post-build steps for macOS bundle
+ add_custom_command(TARGET Zelda64Recompiled POST_BUILD
+     # Copy and fix frameworks first
+diff --git a/assets/recomp.rcss b/assets/recomp.rcss
+index 4aa0135..561386c 100644
+--- a/assets/recomp.rcss
++++ b/assets/recomp.rcss
+@@ -2047,7 +2047,7 @@ scrollbarhorizontal sliderbar {
+ }
+ .menu-list-item--right .menu-list-item__bullet {
+   margin-left: 12dp;
+-  opacity: 1;
++  visibility: hidden;
+ }
+ .menu-list-item--right.menu-list-item:focus:not(:disabled, [disabled]), .menu-list-item--right.menu-list-item:hover:not(:disabled, [disabled]) {
+   decorator: horizontal-gradient(#7A2AC600 #DABAF714);
+diff --git a/assets/scss/styles/components/MenuListItem.scss b/assets/scss/styles/components/MenuListItem.scss
+index 657f0ef..cd1eda1 100644
+--- a/assets/scss/styles/components/MenuListItem.scss
++++ b/assets/scss/styles/components/MenuListItem.scss
+@@ -30,7 +30,7 @@
+ 
+         .menu-list-item__bullet {
+             margin-left: space(12);
+-            opacity: 1;
++            visibility: hidden;
+         }
+ 
+         &.menu-list-item:focus:not(:disabled, [disabled]),
+diff --git a/patches/skip_sos.c b/patches/skip_sos.c
+index 3b1c0fa..0352d5f 100644
+--- a/patches/skip_sos.c
++++ b/patches/skip_sos.c
+@@ -24,6 +24,6 @@ RECOMP_PATCH void EnTest7_Update(Actor* thisx, PlayState* play) {
+     // @recomp Allow skipping the Song of Soaring cutscene.
+     Input* input = CONTROLLER1(&play->state);
+     if (CHECK_BTN_ANY(input->press.button, BTN_A | BTN_B) && (OWL_WARP_CS_GET_OCARINA_MODE(&this->actor) != ENTEST7_ARRIVE)) {
+-        func_80AF2350(thisx, play);
++        func_80AF2350(this, play);
+     }
+ }
+\ No newline at end of file
+diff --git a/lib/rt64/src/common/rt64_hlslpp.h b/lib/rt64/src/common/rt64_hlslpp.h
+index 1450565..b081f87 100644
+--- a/lib/rt64/src/common/rt64_hlslpp.h
++++ b/lib/rt64/src/common/rt64_hlslpp.h
+@@ -10,4 +10,5 @@
+ #define HLSLPP_SCALAR
+ #endif
+ 
++#include <stdlib.h>
+ #include "hlsl++.h"
+\ No newline at end of file
+diff --git a/lib/rt64/src/hle/rt64_workload_queue.cpp b/lib/rt64/src/hle/rt64_workload_queue.cpp
+index 5b0b726..36fe479 100644
+--- a/lib/rt64/src/hle/rt64_workload_queue.cpp
++++ b/lib/rt64/src/hle/rt64_workload_queue.cpp
+@@ -8,9 +8,38 @@
+ 
+ #include "rt64_present_queue.h"
+ 
++#ifdef __APPLE__
++#include <Foundation/NSAutoreleasePool.hpp>
++#endif
++
+ #define ENABLE_HIGH_RESOLUTION_RENDERER 1
+ 
+ namespace RT64 {
++    namespace {
++#ifdef __APPLE__
++        struct ScopedAutoreleasePool {
++            NS::AutoreleasePool *pool = nullptr;
++
++            ScopedAutoreleasePool() {
++                pool = NS::AutoreleasePool::alloc()->init();
++            }
++
++            ~ScopedAutoreleasePool() {
++                pool->drain();
++            }
++
++            ScopedAutoreleasePool(const ScopedAutoreleasePool &) = delete;
++            ScopedAutoreleasePool &operator=(const ScopedAutoreleasePool &) = delete;
++        };
++#else
++        struct ScopedAutoreleasePool {
++            ScopedAutoreleasePool() = default;
++            ScopedAutoreleasePool(const ScopedAutoreleasePool &) = delete;
++            ScopedAutoreleasePool &operator=(const ScopedAutoreleasePool &) = delete;
++        };
++#endif
++    }
++
+     static const int ReferenceHeight = 240;
+     static const int ReferenceInterlacedHeight = 480;
+ 
+@@ -851,6 +880,7 @@ namespace RT64 {
+ 
+     void WorkloadQueue::renderThreadLoop() {
+         Thread::setCurrentThreadName("RT64 Workload");
++        ScopedAutoreleasePool threadPool;
+ 
+         WorkloadConfiguration workloadConfig;
+         int64_t logicalTicks = 0;
+@@ -873,6 +903,7 @@ namespace RT64 {
+             }
+ 
+             if (processCursor >= 0) {
++                ScopedAutoreleasePool workloadPool;
+                 std::unique_lock<std::mutex> threadLock(threadMutex);
+                 Workload &workload = workloads[processCursor];
+                 ext.presentQueue->waitForPresentId(workload.presentId);
+@@ -1164,6 +1195,7 @@ namespace RT64 {
+         // This workaround is not required if the driver is configured to be at the "Max Performance" power state.
+ 
+         Thread::setCurrentThreadName("RT64 Idle");
++        ScopedAutoreleasePool threadPool;
+ 
+         const ShaderRecord &idle = ext.shaderLibrary->idle;
+         RenderCommandList *commandList = ext.workloadGraphicsWorker->commandList.get();
+@@ -1176,6 +1208,7 @@ namespace RT64 {
+             }
+ 
+             if (threadsRunning) {
++                ScopedAutoreleasePool idlePool;
+                 if (workerMutex.try_lock()) {
+                     commandList->begin();
+                     commandList->setPipeline(idle.pipeline.get());
+diff --git a/lib/rt64/src/metal/rt64_metal.cpp b/lib/rt64/src/metal/rt64_metal.cpp
+index 0d88e46..5418ebf 100644
+--- a/lib/rt64/src/metal/rt64_metal.cpp
++++ b/lib/rt64/src/metal/rt64_metal.cpp
+@@ -1058,8 +1058,6 @@ namespace RT64 {
+         // Create texture with configured descriptor and alignment
+         MTL::TextureDescriptor *descriptor = MTL::TextureDescriptor::textureBufferDescriptor(pixelFormat, width, options, usage);
+         this->texture = buffer->mtl->newTexture(descriptor, 0, bytesPerRow);
+-
+-        descriptor->release();
+     }
+ 
+     MetalBufferFormattedView::~MetalBufferFormattedView() {
+@@ -1173,7 +1171,7 @@ namespace RT64 {
+         assert(format == RenderShaderFormat::METAL);
+ 
+         this->format = format;
+-        this->functionName = (entryPointName != nullptr) ? NS::String::string(entryPointName, NS::UTF8StringEncoding) : MTLSTR("");
++        this->functionName = NS::String::alloc()->init(entryPointName != nullptr ? entryPointName : "", NS::UTF8StringEncoding);
+ 
+         NS::Error *error = nullptr;
+         const dispatch_data_t dispatchData = dispatch_data_create(data, size, dispatch_get_main_queue(), ^{});
+@@ -1847,13 +1845,18 @@ namespace RT64 {
+     }
+ 
+     MetalCommandList::~MetalCommandList() {
+-        mtl->release();
++        if (mtl != nullptr) {
++            mtl->release();
++        }
+     }
+ 
+     void MetalCommandList::begin() {
+         assert(mtl == nullptr);
++        NS::AutoreleasePool *releasePool = NS::AutoreleasePool::alloc()->init();
+         mtl = queue->mtl->commandBufferWithUnretainedReferences();
+         mtl->setLabel(MTLSTR("RT64 Command List"));
++        mtl->retain();
++        releasePool->release();
+     }
+ 
+     void MetalCommandList::end() {
+@@ -2763,8 +2766,11 @@ namespace RT64 {
+         activeType = EncoderType::Blit;
+ 
+         if (activeBlitEncoder == nullptr) {
++            NS::AutoreleasePool *releasePool = NS::AutoreleasePool::alloc()->init();
+             activeBlitEncoder = mtl->blitCommandEncoder(device->renderInterface->reusableBlitDescriptor);
+             activeBlitEncoder->setLabel(MTLSTR("Copy Blit Encoder"));
++            activeBlitEncoder->retain();
++            releasePool->release();
+         }
+     }
+ 
+@@ -2783,9 +2789,12 @@ namespace RT64 {
+         activeType = EncoderType::Resolve;
+ 
+         if (activeResolveComputeEncoder == nullptr) {
++            NS::AutoreleasePool *releasePool = NS::AutoreleasePool::alloc()->init();
+             activeResolveComputeEncoder = mtl->computeCommandEncoder();
+             activeResolveComputeEncoder->setLabel(MTLSTR("Resolve Texture Encoder"));
+             activeResolveComputeEncoder->setComputePipelineState(device->renderInterface->resolveTexturePipelineState);
++            activeResolveComputeEncoder->retain();
++            releasePool->release();
+         }
+     }
+ 
+@@ -2868,7 +2877,9 @@ namespace RT64 {
+         assert(commandListCount > 0);
+ 
+         // Create a new command buffer to encode the wait semaphores into
++        NS::AutoreleasePool *releasePool = NS::AutoreleasePool::alloc()->init();
+         MTL::CommandBuffer* cmdBuffer = mtl->commandBufferWithUnretainedReferences();
++        cmdBuffer->retain();
+         cmdBuffer->setLabel(MTLSTR("Wait Command Buffer"));
+         cmdBuffer->enqueue();
+ 
+@@ -2878,6 +2889,8 @@ namespace RT64 {
+         }
+ 
+         cmdBuffer->commit();
++        cmdBuffer->release();
++        releasePool->release();
+ 
+         // Commit all command lists except the last one
+ 
+diff --git a/lib/N64ModernRuntime/N64Recomp/src/recompilation.cpp b/lib/N64ModernRuntime/N64Recomp/src/recompilation.cpp
+index a54b85f..236aa8c 100644
+--- a/lib/N64ModernRuntime/N64Recomp/src/recompilation.cpp
++++ b/lib/N64ModernRuntime/N64Recomp/src/recompilation.cpp
+@@ -297,7 +297,7 @@ bool process_instruction(GeneratorType& generator, const N64Recomp::Context& con
+             }
+             else {
+                 uint32_t target_section = func.section_index;
+-                if (has_reloc) {
++                if (has_reloc && reloc_section < context.sections.size()) {
+                     target_section = reloc_section;
+                 }
+                 JalResolutionResult jal_result = resolve_jal(context, target_section, target_func_vram, matched_func_index);

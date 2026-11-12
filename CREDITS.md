@@ -4,6 +4,7 @@
 - **[N64: Recompiled](https://github.com/N64Recomp/N64Recomp)** and **[N64ModernRuntime](https://github.com/N64Recomp/N64ModernRuntime)** by Mr-Wiseguy and contributors.
 - **[RT64](https://github.com/rt64/rt64)** by Darío and contributors, the renderer.
 - **[zeldaret/oot](https://github.com/zeldaret/oot)** and **[zeldaret/mm](https://github.com/zeldaret/mm)**, the decompilations: the symbols and structures the port is built from.
+- **[Gopher64](https://github.com/gopher64/gopher64)**, whose cheat catalog is an input to the optional game-specific cheat-mod generator. The catalog and generated mod packages are not included here.
 - RmlUi, lunasvg, FreeType and PromptFont, as listed in the original project.
 
 ## How this was made

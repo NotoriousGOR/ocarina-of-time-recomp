@@ -39,6 +39,10 @@
         color: $color-text;
         cursor: default;
     }
+
+    &:not([selected]) {
+        opacity: 0.5;
+    }
     
     &:focus:not(:disabled, [disabled]),
     &:hover:not(:disabled, [disabled], [selected]) {
